@@ -9,8 +9,6 @@
 \usepackage{babel}
 \usepackage{xcolor}
 
-\newcommand\cwrremark[1]{\textcolor{blue}{[CWR: #1]}}
-
 \title{Clustering of Series via Dynamic Mode Decomposition and the Matrix Pencil Method}
 \author{Leonid Pogorelyuk and Clarence W. Rowley}
 
@@ -77,35 +75,29 @@ for sequential data which will be the main subject of this paper.
 Those features, computed on a set of series, are particularly useful for
 clustering purposes.
 
-In section~\ref{sec:DMD_MP_comparison}, we given an overview of DMD, Matrix Pencil methods,
+In section~\ref{sec:DMD_MP_comparison}, we give an overview of DMD, Matrix Pencil methods,
 and ESPRIT, emphasizing their similarities. Based
 on these, an algorithm for extracting features from a set of sequences
 in described in section~\ref{sec:Clustering}. Finally, numerical
 examples for the use of those features for clustering are presented
 in section~\ref{sec:Examples}.
-\cwrremark{It would be helpful at some point (either here or in Section~2) to say
-  something brief about the original motivation for each of the three methods.
-  For instance, for DMD this could be something like, ``DMD was originally
-  proposed in the fluid mechanics community, as a method for identifying
-  coherent structures in fluids flows.''}
 
 \section{\label{sec:DMD_MP_comparison}Comparison Between DMD and Matrix Pencil
 Methods}
 
-\cwrremark{Consider changing the notation to make consistent with that in section 3: e.g., $y(t)$ instead of $y_\tau$ (see remark there).}
 Throughout our discussion, we consider data consisting of measurements
-$y_{\tau}$ of a signal $x_{\tau}$ in the presence of noise $s_{\tau}$,
-where $\tau=0,1,\ldots,T$.  We also assume that the signal is a linear combination of $R$ damped sinusoids, so that it may be written
+$y(t)$ of a signal $x(t)$ in the presence of noise $s(t)$,
+where $t=0,1,\ldots,T$.  We also assume that the signal is a linear combination of $R$ damped sinusoids, so that it may be written
 %
 \begin{equation}
 \begin{aligned}
-  x_{\tau}&=\underset{j=1}{\overset{R}{\sum}}v_{j}\lambda_{j}^{\tau}\\
-  y_{\tau}&=x_{\tau}+s_{\tau},
+  x(t)&=\underset{j=1}{\overset{R}{\sum}}v_{j}\lambda_{j}^{t}\\
+  y(t)&=x(t)+s(t),
 \end{aligned}
 \label{eq:signal}
 \end{equation}
-where $x_{\tau},y_{\tau},s_{\tau},v_{j}\in\mathbb{C}^{n}$, $\lambda_{j}\in\mathbb{C}$. In this section we discuss two families of methods
-which estimate $R$ and $\lambda_{j},v_{j}$ based on the data $\left\{ y_{\tau}\right\} _{\tau=0}^{T}$.
+where $x(t),y(t),s(t),v_{j}\in\mathbb{C}^{n}$, $\lambda_{j}\in\mathbb{C}$. In this section we discuss two families of methods
+which estimate $R$ and $\lambda_{j},v_{j}$ based on the data $\left\{ y(t)\right\} _{t=0}^{T}$.
 
 Earlier frequency estimation methods first approximate the complex frequencies
 $\lambda_1,\ldots,\lambda_R$, and leave the task of finding the coefficients
@@ -129,34 +121,35 @@ the DMD community.
 
 \subsection{\label{sub:DMD}DMD with Delayed Observables and Order Reduction}
 
-In the Dynamic Mode Decomposition (DMD) setting, each pair of
-measurements $\left(y_{\tau},y_{\tau+1}\right)$ from (\ref{eq:signal})
-is called a data snapshot, with the indices $\tau$ not necessarily
+The Dynamic Mode Decomposition (DMD) was originally
+  proposed in the fluid mechanics community, as a method for identifying coherent structures in fluids flows. In DMD setting, each pair of
+measurements $\left(y(t),y(t)\right)$ from (\ref{eq:signal})
+is called a data snapshot, with the indices $t$ not necessarily
 being ordered or sequential.  The general idea behind DMD is to find a linear map such that
 %
 \begin{equation}
-y_{\tau+1}\approx Ly_{\tau},
+y(t+1)\approx Ly(t),
 \end{equation}
 with $L\in\mathbb{C}^{n\times n}$. However, since $L$ has at most
 rank $n$, this approximation is extremely poor when $n<R$ even if
-the measurements are exact, i.e. $s_{\tau}=0,\:\forall\tau$. To alleviate
+the measurements are exact, i.e. $s(t)=0,\:\forall t$. To alleviate
 this problem in the case when sequential data is available, it is
 common to introduce delayed observables \cite{juang1985eigensystem}, as
 %
 \begin{equation}
-z_{\tau}=\left[\begin{array}{c}
-y_{\tau}\\
-y_{\tau+1}\\
+z(t)=\begin{bmatrix}
+y(t)\\
+y(t+1)\\
 \vdots\\
-y_{\tau+d}
-\end{array}\right]\in\mathbb{C}^{\left(d+1\right)n},\label{eq:delayed_observable}
+y(t+d)
+\end{bmatrix}\in\mathbb{C}^{\left(d+1\right)n},\label{eq:delayed_observable}
 \end{equation}
 with $d>0$ delays and $\left(d+1\right)n\ge R$. When no noise is
-present ($s_{\tau}=0$), given enough data, one can fit an autoregressive
+present ($s(t)=0$), given enough data, one can fit an autoregressive
 model \cite{akaike1969fitting}, such that
 %
 \begin{equation}
-z_{\tau+1}=Kz_{\tau},\label{eq:delayed_map}
+z(t)=Kz(t),\label{eq:delayed_map}
 \end{equation}
 holds exactly for some $K\in\mathbb{C}^{\left(d+1\right)n\times\left(d+1\right)n}$.
 In this case, $R$ eigenvalues of $K$ are $\lambda_1,\ldots,\lambda_R$, and
@@ -164,13 +157,13 @@ the rest are zero.
 
 If $R$ is not precisely known but $\left(d+1\right)n>R$, it is necessary
 to get an estimate of the number of frequencies, $\bar{R}$, and project
-the delayed observables $z_{\tau}$ onto an $\bar{R}<\left(d+1\right)n$
+the delayed observables $z(t)$ onto an $\bar{R}<\left(d+1\right)n$
 dimensional space,
 %
 \begin{equation}
-\tilde{z}_{\tau}=Tz_{\tau},
+\tilde{z}(t)=Tz(t),
 \end{equation}
-where $\tilde{z}_{\tau}$ are the reduced order observables and $T\in\mathbb{C}^{\bar{R}\times\left(d+1\right)n}$
+where $\tilde{z}(t)$ are the reduced order observables and $T\in\mathbb{C}^{\bar{R}\times\left(d+1\right)n}$
 has rank $\bar{R}$. In the DMD literature it is customary to compute the
 reduced-order observables using
 Proper Orthogonal Decomposition (POD)
@@ -179,35 +172,35 @@ Analysis (PCA) \cite{hotelling1933analysis,kung1983state}), in which $T$ is
 computed using Singular Value
 Decomposition (SVD), as described in the following subsection.
 
-Consequently, considering the data pair $\left(\tilde{z}_{\tau},\tilde{z}_{\tau+1}\right)$,
+Consequently, considering the data pair $\left(\tilde{z}(t),\tilde{z}(t+1)\right)$,
 the fitted linear map
 %
 \begin{equation}
-\tilde{z}_{\tau+1}=\tilde{K}\tilde{z}_{\tau},
+\tilde{z}(t+1)=\tilde{K}\tilde{z}(t),
 \end{equation}
 with $\tilde{K}\in\mathbb{C}^{\bar{R}\times\bar{R}}$ will, assuming
-$\bar{R}=R$ and $s_{\tau}=0$, have exactly the desired eigenvalues
+$\bar{R}=R$ and $s(t)=0$, have exactly the desired eigenvalues
 $\lambda_1,\ldots,\lambda_R$.
 
 Besides estimating the frequency, one can decompose the signal into
 a sum,
 %
 \begin{equation}
-z_{\tau}=\underset{j=1}{\overset{R}{\sum}}\left[\begin{array}{c}
+z(t)=\underset{j=1}{\overset{R}{\sum}}\begin{bmatrix}
 v_{j}\\
 \lambda_{j}v_{j}\\
 \vdots\\
 \lambda_{j}^{d}v_{j}
-\end{array}\right]\lambda_{j}^{\tau}+\left[\begin{array}{c}
-s_{\tau}\\
-s_{\tau+1}\\
+\end{bmatrix}\lambda_{j}^{t}+\begin{bmatrix}
+s(t)\\
+s(t+1)\\
 \vdots\\
-s_{\tau+d}
-\end{array}\right],\label{eq:delayed_dynamics}
+s(t+d)
+\end{bmatrix},\label{eq:delayed_dynamics}
 \end{equation}
-of so called dynamic modes, $\left[\begin{array}{ccc}
-v_{j}^{T} & ... & \lambda_{j}^{d}v_{j}^{T}\end{array}\right]^{T}$, and a remainder, $\left[\begin{array}{ccc}
-s_{\tau}^{T} & \cdots & s_{\tau+d}^{T}\end{array}\right]^{T}$. Those DMD modes are eigenvectors of $K$ in (\ref{eq:delayed_map})
+of so called dynamic modes, $\begin{bmatrix}
+v_{j}^{T} & ... & \lambda_{j}^{d}v_{j}^{T}\end{bmatrix}^{T}$, and a remainder, $\begin{bmatrix}
+s(t)^{T} & \cdots & s(t+d)^{T}\end{bmatrix}^{T}$. Those DMD modes are eigenvectors of $K$ in (\ref{eq:delayed_map})
 and a discussion on their scaling can be found in \cite{tu2013dynamic}.
 
 We next present the full implementation details of the DMD method.
@@ -215,49 +208,36 @@ We next present the full implementation details of the DMD method.
 
 \subsection{\label{sub:DMD_implementation}DMD implementation}
 
-Given $M$ pairs of snapshots $\left(z_{\tau},z_{\tau+1}\right)$, we
-define the data matrices whose columns consist of the delayed observables
+Given $M$ pairs of snapshots $\left(z(t),z(t+1)\right)$, the data matrices are defined such that their columns consist of the delayed observables
 in no particular order,
 %
 \begin{equation}
 X=\begin{bmatrix}
-  z_{\tau_{0}} & \cdots & z_{\tau_{M-1}}\end{bmatrix},\qquad
+  z(t_{0}) & \cdots & z(t_{M-1})\end{bmatrix},\qquad
 Y=\begin{bmatrix}
-z_{\tau_{0}+1} & \cdots & z_{\tau_{M-1}+1}
+z(t_{0}+1) & \cdots & z(t_{M-1}+1)
 \end{bmatrix}
 .\label{eq:data_matrices}
 \end{equation}
-Note that DMD doesn't require all vectors $z_{\tau}$ that can possibly
-be constructed from the given data $\left\{ y_{\tau}\right\} _{\tau=0}^{T}$.
-Indeed, one valid possibility is to ``skip'' some of of the observables
-when constructing the matrices, i.e.,
+For a sequential signal, one may choose $t_{i}=i$ and construct the data matrices,
 %
 \begin{equation}
 X=\begin{bmatrix}
-y_{0} & y_{s} & \cdots\\
-y_{1} & y_{s+1}\\
+y(0) & y(1) & \cdots\\
+y(1) & y(2)\\
 \vdots & \vdots\\
-y_{d} & y_{s+d} & \cdots
+y(d) & y(d+1) & \cdots
 \end{bmatrix}
 ,\:Y=\begin{bmatrix}
-y_{1} & y_{s+1} & \cdots\\
-y_{2} & y_{s+2}\\
+y(1) & y(2) & \cdots\\
+y(2) & y(3)\\
 \vdots & \vdots\\
-y_{d+1} & y_{s+d+1} & \cdots
+y(d+1) & y(d+2) & \cdots
 \end{bmatrix}
 ,\label{eq:sequential_data_matrices}
 \end{equation}
-where $s\ge1$ is a parameter, $\tau_{i}=i\cdot s$ and $X,Y\in\mathbb{C}^{\left(d+1\right)n\times M}$.
-This freedom of choice of a subset of all possible delayed observables
-might allow for faster computational time while retaining sufficient
-accuracy and is subject to further research. \cwrremark{This is also considered
-  in Jonathan's paper~\cite{tu2013dynamic}, section 3.2.3.  Probably best to
-  leave this out altogether, since it's not a new thing, and seems a bit
-  unrelated to the rest of the paper.}
-\cwrremark{Oops!  I see we do refer to
-  equation~(\ref{eq:sequential_data_matrices}) later, so perhaps we should keep
-  it?  I am not sure how helpful or necessary this analogy is, but if we do keep
-it, we should not make it sound like a new idea.}
+to be used in the following algorithm.
+
 \emph{Step 1}: Compute the Singular Value Decomposition (SVD) 
 \begin{equation}
 X=U\Sigma V^{*},
@@ -297,30 +277,30 @@ called the DMD modes, while the rows of $\tilde{V}^{-1}U_{\bar{R}}^{*}$
 are the left eigenvectors and are known as the adjoint DMD modes \cite{tu2013dynamic}.
 
 \emph{Step }5: To find an appropriate scaling for the DMD modes we
-first notice that for any $\tau,\rho$ it follows from (\ref{eq:delayed_map}),
+first notice that for any $t,\tau$ it follows from (\ref{eq:delayed_map}),
 (\ref{eq:eigendecomposition}) and (\ref{eq:delayed_map_approx})
 that
 %
 \begin{equation}
-z_{\tau}\approx K^{\tau-\rho}z_{\rho}\approx\underset{j=1}{\overset{\bar{R}}{\sum}}c_{\rho,j}w_{j}\bar{\lambda}_{j}^{\tau-\rho},
+z(t)\approx K^{t-\tau}z(\tau)\approx\underset{j=1}{\overset{\bar{R}}{\sum}}c_{\tau,j}w_{j}\bar{\lambda}_{j}^{t-\tau},
 \end{equation}
 where $w_{j}=\left(U_{\bar{R}}\tilde{V}\right)_{j}\in\mathbb{C}^{\left(d+1\right)n}$
-is the $j$th DMD mode and $c_{\rho,j}=\left(\tilde{V}^{-1}U_{\bar{R}}^{*}z_{\rho}\right)_{j}\in\mathbb{C}$
-are scaling coefficients based on the $\rho$th snapshot.
+is the $j$th DMD mode and $c_{\tau,j}=\left(\tilde{V}^{-1}U_{\bar{R}}^{*}z(\tau)\right)_{j}\in\mathbb{C}$
+are scaling coefficients based on the $\tau$th snapshot.
 
-In general, since $M>\bar{R}$, one has $c_{\rho_{1},j}\bar{\lambda}_{j}^{-\rho_{1}}\ne c_{\rho_{2},j}\bar{\lambda}_{j}^{-\rho_{2}}$
+In general, since $M>\bar{R}$, one has $c_{\tau_{1},j}\bar{\lambda}_{j}^{-\tau_{1}}\ne c_{\tau_{2},j}\bar{\lambda}_{j}^{-\tau_{2}}$
 (unlike in the underconstrained case discussed in \cite{tu2013dynamic}),
 hence we suggest a scaling for the $j$th DMD mode based on an average
 of its scaling coefficients at all time snapshots,
 %
 \begin{equation}
-c_{j}=\frac{1}{M}\underset{\rho\in\left\{ \tau_{1},...,\tau_{M}\right\} }{\sum}\left(\tilde{V}^{-1}U_{\bar{R}}^{*}z_{\rho}\right)_{j}\bar{\lambda}_{j}^{-\rho}.
+c_{j}=\frac{1}{M}\underset{\tau\in\left\{ t_{1},...,t_{M}\right\} }{\sum}\left(\tilde{V}^{-1}U_{\bar{R}}^{*}z(\tau)\right)_{j}\bar{\lambda}_{j}^{-\tau}.
 \end{equation}
 This gives an approximation of the dynamics in delayed observables
 (see (\ref{eq:delayed_dynamics})),
 %
 \begin{equation}
-z_{\tau}\approx\underset{j=1}{\overset{\bar{R}}{\sum}}c_{j}w_{j}\bar{\lambda}_{j}^{\tau},\label{eq:approx_delayed_dynamics}
+z(t)\approx\underset{j=1}{\overset{\bar{R}}{\sum}}c_{j}w_{j}\bar{\lambda}_{j}^{t},\label{eq:approx_delayed_dynamics}
 \end{equation}
 where $c_{j}w_{j}\in\mathbb{C}^{\left(d+1\right)n}$ are the scaled
 dynamic modes of the delayed observable. The coefficients $v_{j}$
@@ -335,28 +315,22 @@ $kn$th elements.
 
 
 \subsection{\label{sub:matrix_pencil}Matrix Pencil Methods}
-
-\cwrremark{Say something about the origins of the Matrix Pencil Method: what was
-  the original motivating problem that \cite{hua1988matrix} considered, and what is
-  the goal of the method? (See remark at end of section~1.)}
-The authors of the Matrix Pencil Method in \cite{hua1988matrix},
-consider the data matrices
+The authors of the Matrix Pencil \cite{hua1988matrix} and the State Space \cite{kung1983state} methods originally considered the problem of retrieving parameters of sinusoidal processes (with frequencies close to one another) from noisy measurements. There, the data matrices are defined as 
 %
 \begin{equation}
-X=\left[\begin{array}{ccc}
-\cdots & y_{1} & y_{0}\\
- & y_{2} & y_{1}\\
+X=\begin{bmatrix}
+\cdots & y(1) & y(0)\\
+ & y(2) & y(1)\\
  & \vdots & \vdots\\
-\cdots & y_{d+1} & y_{d}
-\end{array}\right],\:Y=\left[\begin{array}{ccc}
-\cdots & y_{2} & y_{1}\\
- & y_{3} & y_{2}\\
+\cdots & y(d+1) & y(d)
+\end{bmatrix},\:Y=\begin{bmatrix}
+\cdots & y(2) & y(1)\\
+ & y(3) & y(2)\\
  & \vdots & \vdots\\
-\cdots & y_{d+2} & y_{d+1}
-\end{array}\right],
+\cdots & y(d+2) & y(d+1)
+\end{bmatrix},
 \end{equation}
-which corresponds to a reversed ordering with respect to (\ref{eq:sequential_data_matrices})
-and with $s=1$. The method proceeds by finding the generalized eigenvectors
+which correspond to a reversed ordering with respect to (\ref{eq:sequential_data_matrices}). The Matrix Pencil method proceeds by finding the generalized eigenvectors
 of the matrix pencil $\left(X,Y\right)$, i.e. $\bar{\lambda}\in\mathbb{C}$
 and $p\in\mathbb{C}^{M}$, $q\in\mathbb{C}^{\left(d+1\right)n}$ in
 the row and column spaces of $X$ respectively, such that
@@ -440,29 +414,24 @@ effort of standard variants.
 
 
 \subsection{\label{sub:ESPRIT}ESPRIT}
+ESPRIT was originally developed for estimating the direction of arrival of signals generated by a set of narrowband emitters and collected by an array of sensors \cite{roy1986estimation}. As mentioned earlier, it is equivalent to the Matrix Pencil Method and  DMD with delayed observables when applied to the same sequential
+data. However, an observation was made by the authors of ESPRIT, that when the emitted signals are uncorrelated their power can be estimated. This observation provided an inspiration for us to extend DMD to a clustering procedure for multiple times series
+which will be described in the next section.
 
-\cwrremark{Say something about the origins of ESPRIT here (original motivation,
-  the goal of the method, etc.}
-As mentioned earlier, the Matrix Pencil Method, DMD with delayed
-observables, and ESPRIT are all equivalent when applied to the same sequential
-data. Hence, we present here a conclusion made by the authors of ESPRIT
-\cite{roy1986estimation}, which provided inspiration for us to extend DMD to a clustering procedure for multiple times series
-(as described in the next section). \cwrremark{I don't see what specific conclusion you are referring to here. Is it the remark in the last paragraph about estimating power?}
-
-In this approach the data matrices are interpreted as
+In the ESPRIT approach the data matrices are interpreted as
 %
 \begin{equation}
-\begin{array}{c}
-X=\underset{j=1}{\overset{R}{\sum}}a_{j}b_{j}^{T}=AB^{T}\\
-Y=\underset{j=1}{\overset{R}{\sum}}\lambda_{j}a_{j}b_{j}^{T}=A\Lambda B^{T}
-\end{array},\label{eq:ESPRIT}
+\begin{aligned}
+X&=\underset{j=1}{\overset{R}{\sum}}a_{j}b_{j}^{T}=AB^{T}\\
+Y&=\underset{j=1}{\overset{R}{\sum}}\lambda_{j}a_{j}b_{j}^{T}=A\Lambda B^{T}
+\end{aligned},\label{eq:ESPRIT}
 \end{equation}
 where the columns of $X$ are outputs of a first array of sensors, and
 the columns of $Y$ are outputs of a second array---identical, but
-shifted relative to the first. Also, the $j$th column of $A=\left[\begin{array}{ccc}
-a_{1} & \cdots & a_{R}\end{array}\right]$ corresponds to direction-of-arrival vectors of (or sensors response
-to) the $j$th signal, the $j$th columns of $B=\left[\begin{array}{ccc}
-b_{1} & \cdots & b_{R}\end{array}\right]$ consists of samples of the complex envelopes of the $j$th signal,
+shifted relative to the first. Also, the $j$th column of $A=\begin{bmatrix}
+a_{1} & \cdots & a_{R}\end{bmatrix}$ corresponds to direction-of-arrival vectors of (or sensors response
+to) the $j$th signal, the $j$th columns of $B=\begin{bmatrix}
+b_{1} & \cdots & b_{R}\end{bmatrix}$ consists of samples of the complex envelopes of the $j$th signal,
 and $\Lambda=\mathrm{diag}\left\{ \lambda_{j}\right\} \in\mathbb{C}^{R\times R}$
 corresponds to a phase shift between the first array of sensors and
 the second one \cite{zoltowski1989sensor}.
@@ -473,56 +442,50 @@ delayed observables. Indeed, from (\ref{eq:signal}), (\ref{eq:delayed_observable
 and (\ref{eq:data_matrices}) we see that
 %
 \begin{equation}
-X=\underset{j=1}{\overset{R}{\sum}}\left[\begin{array}{ccc}
-v_{j}\lambda_{j}^{\tau_{1}} & \cdots & v_{j}\lambda_{j}^{\tau_{M}}\\
-v_{j}\lambda_{j}^{\tau_{1}+1} & \cdots & v_{j}\lambda_{j}^{\tau_{M}+1}\\
+X=\underset{j=1}{\overset{R}{\sum}}\begin{bmatrix}
+v_{j}\lambda_{j}^{t_{1}} & \cdots & v_{j}\lambda_{j}^{t_{M}}\\
+v_{j}\lambda_{j}^{t_{1}+1} & \cdots & v_{j}\lambda_{j}^{t_{M}+1}\\
 \vdots &  & \vdots\\
-v_{j}\lambda_{j}^{\tau_{1}+d} & \cdots & v_{j}\lambda_{j}^{\tau_{M}+d}
-\end{array}\right],\:Y=\underset{j=1}{\overset{R}{\sum}}\left[\begin{array}{ccc}
-v_{j}\lambda_{j}^{\tau_{1}+1} & \cdots & v_{j}\lambda_{j}^{\tau_{M}+1}\\
-v_{j}\lambda_{j}^{\tau_{1}+2} & \cdots & v_{j}\lambda_{j}^{\tau_{M}+2}\\
+v_{j}\lambda_{j}^{t_{1}+d} & \cdots & v_{j}\lambda_{j}^{t_{M}+d}
+\end{bmatrix},\:Y=\underset{j=1}{\overset{R}{\sum}}\begin{bmatrix}
+v_{j}\lambda_{j}^{t_{1}+1} & \cdots & v_{j}\lambda_{j}^{t_{M}+1}\\
+v_{j}\lambda_{j}^{t_{1}+2} & \cdots & v_{j}\lambda_{j}^{t_{M}+2}\\
 \vdots &  & \vdots\\
-v_{j}\lambda_{j}^{\tau_{1}+d+1} & \cdots & v_{j}\lambda_{j}^{\tau_{M}+d+1}
-\end{array}\right],
+v_{j}\lambda_{j}^{t_{1}+d+1} & \cdots & v_{j}\lambda_{j}^{t_{M}+d+1}
+\end{bmatrix},
 \end{equation}
 and hence may choose
 %
 \begin{equation}
-A=\left[\begin{array}{ccc}
+A=\begin{bmatrix}
 \frac{v_{1}}{\left\Vert v_{1}\right\Vert }\lambda_{1}^{0} & \cdots & \frac{v_{R}}{\left\Vert v_{R}\right\Vert }\lambda_{R}^{0}\\
 \frac{v_{1}}{\left\Vert v_{1}\right\Vert }\lambda_{1}^{1} & \cdots & \frac{v_{R}}{\left\Vert v_{R}\right\Vert }\lambda_{R}^{1}\\
 \vdots &  & \vdots\\
 \frac{v_{1}}{\left\Vert v_{1}\right\Vert }\lambda_{1}^{d} & \cdots & \frac{v_{R}}{\left\Vert v_{R}\right\Vert }\lambda_{R}^{d}
-\end{array}\right],\:B=\left[\begin{array}{ccc}
-\left\Vert v_{1}\right\Vert \lambda_{1}^{\tau_{1}} & \cdots & \left\Vert v_{1}\right\Vert \lambda_{1}^{\tau_{M}}\\
+\end{bmatrix},\:B=\begin{bmatrix}
+\left\Vert v_{1}\right\Vert \lambda_{1}^{t_{1}} & \cdots & \left\Vert v_{1}\right\Vert \lambda_{1}^{t_{M}}\\
 \vdots &  & \vdots\\
-\left\Vert v_{R}\right\Vert \lambda_{R}^{\tau_{1}} & \cdots & \left\Vert v_{R}\right\Vert \lambda_{R}^{\tau_{M}}
-\end{array}\right]\label{eq:ESPRIT_matrices}
+\left\Vert v_{R}\right\Vert \lambda_{R}^{t_{1}} & \cdots & \left\Vert v_{R}\right\Vert \lambda_{R}^{t_{M}}
+\end{bmatrix}\label{eq:ESPRIT_matrices}
 \end{equation}
 to put the matrices in the form of (\ref{eq:ESPRIT}).
 
 In \cite{roy1986estimation} the authors show that when the sources
 are uncorrelated their ``power'' can be estimated. In other words
-one can estimate $B^{*}B$ if it is diagonal. Unfortunately, this
-constraint is inconsistent with (\ref{eq:ESPRIT_matrices}) since
-each data snapshot is always affected by all of the frequencies.
-\cwrremark{Is this always the case with ESPRIT, or just with our interpretation
-  of it as being equivalent to DMD? Probably worth saying something about this,
-  and why $B^*B$ might be diagonal for the situation considered
-  in~\cite{roy1986estimation}, but not here.}
+one can estimate $B^{*}B$ if it is diagonal.  Unfortunately, while in the ESPRIT framework it is possible for the sources to be uncorrelated, in the formulation consistent with DMD (Eq.~(\ref{eq:ESPRIT_matrices})), $B^{*}B$ can never be diagonal because each data snapshot is always affected by all of the frequencies.
 However,
 in the next section we will consider data consisting of multiple signals,
 each exhibiting a subset of frequencies with different magnitudes,
 i.e.,
 %
 \begin{equation}
-B=\left[\begin{array}{ccc}
-b_{1,\tau_{1}}\lambda_{1}^{\tau_{1}} & \cdots & b_{1,\tau_{M}}\lambda_{1}^{\tau_{M}}\\
+B=\begin{bmatrix}
+b_{1,t_{1}}\lambda_{1}^{t_{1}} & \cdots & b_{1,t_{M}}\lambda_{1}^{t_{M}}\\
 \vdots &  & \vdots\\
-b_{R,\tau_{1}}\lambda_{R}^{\tau_{1}} & \cdots & b_{R,\tau_{M}}\lambda_{R}^{\tau_{M}}
-\end{array}\right],
+b_{R,t_{1}}\lambda_{R}^{t_{1}} & \cdots & b_{R,t_{M}}\lambda_{R}^{t_{M}}
+\end{bmatrix}],
 \end{equation}
-where $b_{j,\tau_{k}}\in\mathbb{R}^{+}$. In that case DMD (or Matrix
+where $b_{j,t_{k}}\in\mathbb{R}^{+}$. In that case DMD (or Matrix
 Pencil method) might find the coefficients in $B$ and thus characterize
 each time snapshot according to the prevalent frequencies it exhibits.
 Furthermore, it might be possible to group ``similar'' snapshots
@@ -537,7 +500,7 @@ we present a novel method for computing features of data series to
 allow clustering them into groups of similar underlying dynamics,
 that is, similar values of~$\lambda_j$ in (\ref{eq:signal}).
 
-In Section~\ref{sec:DMD_MP_comparison} the underlying assumption
+In section~\ref{sec:DMD_MP_comparison} the underlying assumption
 was that all of the data comes from a single system, or a group of
 independent systems to which DMD or Matrix Pencil methods are to be
 applied separately. If we suspect that the set of time series constituting
@@ -547,7 +510,7 @@ may wish to group the series based on similar underlying dynamics.
 Among the many approaches to clustering of time series, we focus on
 ones that assume a model behind the data \cite{liao2005clustering}.
 As an example, fitting autoregression parameters, defining some associated
-metric and using them as features is one common approach\cite{piccolo1990distance,xiong2002mixtures}.
+metric and using them as features is one common approach \cite{piccolo1990distance,xiong2002mixtures}.
 However, to the best of our knowledge, all contemporary clustering
 techniques compute the model parameters (or features) for each time
 series separately. Inspired by the ESPRIT algorithm (see discussion
@@ -558,11 +521,7 @@ generalized eigenvectors) as features for clustering purposes.
 
 \subsection{\label{sub:DMD_clustering}DMD Clustering of Time Series}
 
-Consider $N$ series each consisting of $d+1$ data points, $\left\{ y_{i}(t)\right\} ,\:1\le i\le N,0\le t\le d+1$.
-\cwrremark{Isn't that $d+2$ data points, including both $t=0$ and $t=d+1$? Maybe
-  better to say $t=0,\ldots,d$ instead of $0\le t \le d+1$ anyway, since $t$ is
-  discrete.  Also, good to state explicitly that $y_i(t)\in\mathbb{C}^n$
-  (assuming that is correct!).}
+Consider $N$ series each consisting of $d+2$ data points, $\left\{ y_{i}(t)\right\}\subset\mathbb{C}^{n}\:,i=1,\ldots,N,\:t=0,\ldots,d+1$.
 We assume that each time series is a sum of damped sinusoids as in
 section \ref{sec:DMD_MP_comparison} (Eq. (\ref{eq:signal})).  Each time
 series was generated by one of several different dynamical systems, and the
@@ -571,21 +530,19 @@ number of time series~$N$. Formally, we assume that the time series are split
 into $P$ partitions
 %
 \begin{equation}
-\begin{array}{c}
-I_{1}\cup\cdots\cup I_{P}=\left\{ 1,\cdots,N\right\} \\
-I_{1}\cap\cdots\cap I_{P}=\emptyset
-\end{array},\label{eq:partitions}
+\begin{aligned}
+I_{1}\cup\cdots\cup I_{P}&=\left\{ 1,\cdots,N\right\} \\
+I_{1}\cap\cdots\cap I_{P}&=\emptyset
+\end{aligned},\label{eq:partitions}
 \end{equation}
 each corresponding to the dynamics
 %
 \begin{equation}
-\begin{array}{c}
-x_{i}(t)=\underset{k=1}{\overset{l_{j}}{\sum}}v_{ijk}\lambda_{jk}^{t}\in\mathbb{C}^{n},\:i\in I_{j}\end{array}\label{eq:systems}
+x_{i}(t)=\underset{k=1}{\overset{l_{j}}{\sum}}v_{ijk}\lambda_{jk}^{t}\in\mathbb{C}^{n},\:i\in I_{j}\label{eq:systems}
 \end{equation}
 where $l_{j}$ is the number of oscillators in the $j$-th partition,
 $\left\{ \lambda_{jk}\right\} _{k=1}^{l_{j}}\subset\mathbb{C}$ are
 the corresponding complex frequencies for that partition and $x_{i}v_{ijk},\in\mathbb{C}^{n}$.
-\cwrremark{Before snapshots were $y_\tau$, $x_\tau$, etc, while now they are $y(t)$, $x(t)$, etc.  Would be better to make consistent (use parens throughout, change $\tau$ to $t$ earlier?).}
 
 To state the general problem: we wish to estimate the complex frequencies
 $\lambda_{jk}$ as well as the partitions $I_{j}$ from data given
@@ -600,39 +557,36 @@ First, consider the left generalized eigenvectors of the matrix pencil
 $\left(X,Y\right)$, where $X$ and $Y$ are data matrices
 %
 \begin{equation}
-X=\left[\begin{array}{ccc}
+X=\begin{bmatrix}
 y_{1}(0) & \cdots & y_{N}(0)\\
 \vdots &  & \vdots\\
 y_{1}(d) & \cdots & y_{N}(d)
-\end{array}\right],\:Y=\left[\begin{array}{ccc}
+\end{bmatrix},\:Y=\begin{bmatrix}
 y_{1}(1) & \cdots & y_{N}(1)\\
 \vdots &  & \vdots\\
 y_{1}(d+1) & \cdots & y_{N}(d+1)
-\end{array}\right],\label{eq:data_multiple}
+\end{bmatrix},\label{eq:data_multiple}
 \end{equation}
-of the dimensions $nd\times N$. The following property of the matrix
+of the dimensions $nd\times N$, which is the standard arrangement for DMD with delayed observables (similarly to (\ref{eq:sequential_data_matrices})).
+The following property of the matrix
 pencil in the noise-free case will be useful when determining the
-partitions $I_{j}$.
+partitions $I_{j}$. It requires that the number of series in each partition, $\big|I_j\big|$ (here, $|I_j|$ denotes the cardinality of the set $I_j$), is greater than $nl_{j}$, the dimensionality of the dynamic modes of the $j$th system.
 
 \emph{Proposition 1}: For $j\in\{1,\ldots,P\}$, let $\Xi_j$ be a matrix with
 $\big|I_j\big|$ columns given by
 \[
-\begin{bmatrix}
+\Xi_{j}=\begin{bmatrix}
 v_{ij1}\\
 \vdots\\
 v_{ijl_{j}}
-\end{bmatrix},
+\end{bmatrix}_{i\in I_{j}}\in\mathbb{C}^{nl_{j}\times\left|I_{j}\right|},
 \qquad i\in I_j.
 \]
-(Here, $|I_j|$ denotes the cardinality of the set $I_j$.)  The matrix $\Xi_j$
+The matrix $\Xi_j$
 thus has $nl_j$ rows and consists of all the coefficients (modes) of all systems
 in (\ref{eq:systems}) belonging to the $j$th partition and stacked
 \emph{on top of each other}. Assume that the matrices~$\Xi_{j}$ have full column
-rank \cwrremark{by this, do you mean rank $nl_j$ or rank $|I_j|$? I think it is the
-  latter, but below we assume $|I_j|\ge nl_j$, so the rank can be at most $nl_j$.  Is the below inequality
-  backwards or am I wrong about the rank?  In any case, would be good to clarify
-  what ``full column rank'' means.  (I would interpret this as meaning ``the rank of
-  the matrix equals the number of columns.'')} for all $j\in\{1,\dots,P\}$ (and in particular $\left|I_{j}\right|\ge nl_{j},\:\forall j$),
+rank for all $j\in\{1,\dots,P\}$ (and in particular $\left|I_{j}\right|\ge nl_{j}=\mathrm{rank}\left(\Xi_{j}\right),\:\forall j$),
 that $d\ge\sum l_{j}$ and that no noise is present, $s_{i}(t)=0,\:\forall i,t$.
 Then the following hold:
 \begin{enumerate}
@@ -646,7 +600,7 @@ is the number of distinct eigenvalues among all systems in all partitions
 \item Let $p_{\lambda}$ be a generalized right eigenvector of the matrix
 pencil $\left(X,Y\right)$ corresponding to the eigenvalue $\lambda$.
 If the $i$th data snapshot corresponding to the $j$th partition
-($i\in I_{j}$) doesn't exhibit $\lambda$ in it's dynamics ($\lambda\notin\left\{ \lambda_{jk}\right\} _{k=1}^{l_{j}}$),
+($i\in I_{j}$) doesn't exhibit $\lambda$ in its dynamics ($\lambda\notin\left\{ \lambda_{jk}\right\} _{k=1}^{l_{j}}$),
 then the $i$th element of $p_{\lambda}$ is zero. 
 \end{enumerate}
 \emph{Proof}: See Appendix A.
@@ -657,25 +611,25 @@ at different times, similar to the approach in section~\ref{sec:DMD_MP_compariso
 arrange the data as
 %
 \begin{equation}
-\hat{X}=\left[\begin{array}{ccc}
+\hat{X}=\begin{bmatrix}
 y_{1}(0) & \cdots & y_{1}(d)\\
 \vdots &  & \vdots\\
 y_{N}(0) & \cdots & y_{N}(d)
-\end{array}\right],\:\hat{Y}=\left[\begin{array}{ccc}
+\end{bmatrix},\:\hat{Y}=\begin{bmatrix}
 y_{1}(1) & \cdots & y_{1}(d+1)\\
 \vdots &  & \vdots\\
 y_{N}(1) & \cdots & y_{N}(d+1)
-\end{array}\right]\label{eq:data_mult_trans}
+\end{bmatrix}\label{eq:data_mult_trans}
 \end{equation}
 with $\hat{X},\hat{Y}\in\mathbb{C}^{nN\times d}$, viewing all the
 time series as consequent time snapshots of one large system. The
-matrix pencil $\left(\hat{X},\hat{Y}\right)$ has a similar properties
-to $\left(X,Y\right)$ as stated in the following proposition.
+matrix pencil $\left(\hat{X},\hat{Y}\right)$ has similar properties
+to $\left(X,Y\right)$ but requires ``less'' data and is therefore more useful for a numerical algorithm as stated in the next proposition and its discussion.
 
 \emph{Proposition 2}: For $j\in \{1,\ldots,P\}$, let $\Xi_j$ be a matrix with
 $n|I_j|$ rows, given by
 \[
-\begin{bmatrix}
+\Xi_j = \begin{bmatrix}
   v_{ij1} & \cdots & v_{ijl_{j}}
 \end{bmatrix},
 \qquad i\in I_{j}.\in\mathbb{C}^{n\left|I_{j}\right|\times l_{j}}
@@ -683,8 +637,7 @@ $n|I_j|$ rows, given by
 Thus, the matrix $\Xi_j$ has $l_j$ columns and consists of all the coefficients (modes) of all systems
 in (\ref{eq:systems}) belonging to the $j$th partition and placed
 \emph{next to each other}. Assume that $\Xi_{j}$ has full row rank
-for each $j$ \cwrremark{see previous remark about clarifying row/column rank and
-checking the inequality below} (and in particular $n\left|I_{j}\right|\ge l_{j}$),
+for each $j$ (i.e. $n\left|I_{j}\right|\ge l_{j}=\mathrm{rank}\left(\Xi_{j}\right)$),
 that $d\ge\sum l_{j}$ and that no noise is present, $s_{i}(t)=0,\:\forall i,t$.
 Then the following hold:
 \begin{enumerate}
@@ -693,8 +646,8 @@ independent left generalized eigenvectors where $l\le\sum l_{j}$
 is the number of unique eigenvalues (see (\ref{eq:unique_evals})). 
 \item Let $q_{\lambda}$ be a generalized left eigenvector of the matrix
 pencil $\left(\hat{X},\hat{Y}\right)$ corresponding to the eigenvalue
-$\lambda$. If $i$th data snapshot corresponding to the $j$th partition
-($i\in I_{j}$) doesn't exhibit $\lambda$ in it's dynamics ($\lambda\notin\left\{ \lambda_{jk}\right\} _{k=1}^{l_{j}}$),
+$\lambda$. If the $i$th data snapshot corresponding to the $j$th partition
+($i\in I_{j}$) doesn't exhibit $\lambda$ in its dynamics ($\lambda\notin\left\{ \lambda_{jk}\right\} _{k=1}^{l_{j}}$),
 the $n$ elements of $q_{\lambda}$ beginning at $i\cdot n$ are all
 zero. 
 \end{enumerate}
@@ -707,13 +660,6 @@ and yield more generalized eigenvectors compared to Proposition 2.
 For this reason we chose the arrangement in (\ref{eq:data_mult_trans})
 over (\ref{eq:data_multiple}) in the example presented in section
 \ref{sub:clustering_example}.
-\cwrremark{Is the arrangement in Proposition~2 always better than that in
-  Proposition~1?  If so, might be better to leave out Proposition~1 altogether,
-  or maybe just mention the alternative arrangement briefly as a remark?  No
-  need to force the reader to wade through the notation twice if we're not going
-  to use Prop 1 anyway.  I understand that the proof of Prop 2 follows from Prop
-1, but the Prop 1 arrangement could still be used in the proof of Prop 2 in the
-appendix, if that is more natural.}
 
 The presence of zero elements in the generalized eigenvectors
 corresponding to different data series can be exploited in order to find
@@ -726,7 +672,7 @@ of the generalized eigenvectors to be exactly zero as stated in Propositions
 1 and~2. However, when using truncated SVD with the Matrix Pencil
 method, the resulting generalized eigenvectors are continuous functions
 of the data \cite{hua1990matrix}. Consequently, we expect the elements
-which should be theoretically be zero, to remain close to zero for
+which should theoretically be zero, to remain close to zero for
 low levels of noise; this will be verified in an example in
 section~\ref{sub:toy_example}.  We first discuss some details of
 the implementation.
@@ -734,7 +680,6 @@ the implementation.
 
 \subsection{\label{sub:cluster_impl}Implementation}
 
-\cwrremark{As in previous remark, maybe leave out the alternative arrangement~(\ref{eq:data_multiple})?}
 As mentioned earlier, the choice of arranging the data as in (\ref{eq:data_mult_trans})
 has the benefits of giving a lower dimensional system and requiring
 less data. We therefore will use the matrix pencil $\left(\hat{X},\hat{Y}\right)$
@@ -789,11 +734,11 @@ Consequently, each of the DMD features can be seen as a transformation
 of the appropriate data snapshot,
 %
 \begin{equation}
-q_{i}=\left|\hat{W}\Sigma_{\bar{l}}^{-1}V_{\bar{l}}^{*}\left[\begin{array}{c}
+q_{i}=\left|\hat{W}\Sigma_{\bar{l}}^{-1}V_{\bar{l}}^{*}\begin{bmatrix}
 y_{i}^{*}(0)\\
 \vdots\\
 y_{i}^{*}(d)
-\end{array}\right]\right|,\label{eq:DMD_features}
+\end{bmatrix}\right|,\label{eq:DMD_features}
 \end{equation}
 where $\left|\cdot\right|$ stands for applying absolute value to
 each elements of the matrix.
@@ -806,11 +751,11 @@ and the centers of clusters in the feature space, $\mathbb{R}_{+}^{\bar{l}\times
 Then, new data $\left\{ y(t)\right\} _{t=0}^{d}$ can be mapped into
 the feature space via 
 \begin{equation}
-q=\left|\hat{W}\Sigma_{\bar{l}}^{-1}V_{\bar{l}}^{*}\left[\begin{array}{c}
+q=\left|\hat{W}\Sigma_{\bar{l}}^{-1}V_{\bar{l}}^{*}\begin{bmatrix}
 y^{*}(0)\\
 \vdots\\
 y^{*}(d)
-\end{array}\right]\right|,
+\end{bmatrix}\right|,
 \end{equation}
 and assigned to a previously ``learned'' cluster.
 
@@ -831,8 +776,8 @@ x(t)=\left\{ \begin{array}{cc}
 \end{array}\right.\label{eq:ex1_dynamics}
 \end{equation}
 The measurements $y(t)=x(t)+s(t)$ were taken at $t\in\left\{ -1,-0.9,...,0.9,1.0\right\} $
-with the noise $s$ normally distribution with $\sigma=0.01$. The
-discrete data and its underlying dynamics are shown in Figure~\ref{fig:example1}(a).
+with the noise $s$ normally distributed with $\sigma=0.01$. The
+discrete data and its underlying dynamics are shown in figure~\ref{fig:example1}(a).
 
 For this example we use an observable with $d=3$ time delays and
 arrange the data as in (\ref{eq:data_mult_trans}) into $\hat{X},\hat{Y}\in\mathbb{R}^{17\times4}$,
@@ -858,16 +803,16 @@ procedure is repeated until it produces enough inliers.
 As expected, standard DMD yields slightly biased eigenvalues, while
 DMD with RANSAC correctly identifies the observables corresponding
 to $t=\left\{ -0.3,-0.2,-0.1\right\} $ as outliers, and gives better
-estimates of the eigenvalues (Figure~\ref{fig:example1}(b)). The
+estimates of the eigenvalues (figure~\ref{fig:example1}(b)). The
 left and right generalized eigenvectors of the matrix pencil $\big(\hat{X},\hat{Y}\big)$
-are shown in Figure~\ref{fig:example1}(c) and~(d) respectively.
+are shown in figure~\ref{fig:example1}(c) and~(d) respectively.
 When excluding outliers (via RANSAC), the left eigenvectors are complex
 sinusoids with frequencies given by~(\ref{eq:ex1_dynamics}) and the
-right eigenvectors are split into two regions: for $t\ge0$ the elements
-are very close to zero in the region where each frequency is not present
+right eigenvectors are split into two regions: for $t\ge0$ the elements corresponding to the first frequency
+are very close to zero
 and vice versa for $t\le-0.3$. The standard DMD gives eigenvectors
 which are somewhat off, however the regions can still be clearly seen
-in Figure~\ref{fig:example1}(d). Again, this happens because the underlying
+in figure~\ref{fig:example1}(d). Again, this happens because the underlying
 dynamics are not truly linear, although the resulting eigenvectors
 still give useful features for determining these two regions. This will
 be illustrated in the following example.
@@ -878,7 +823,6 @@ be illustrated in the following example.
 \caption{(a) Discrete ``measurements'' (triangles) of
 time series consisting of two different oscillators defined in (\ref{eq:ex1_dynamics})
 (dashed line).
-\cwrremark{Please label vertical axis ($y(t)$?).  Also in plots (c) and~(d).}
 (b) Eigenvalues computed by DMD with RANSAC ($\circ$) and without
 RANSAC ($\square$), as
 approximations of the true eigenvalues ($\times$) of the discrete system
@@ -889,11 +833,8 @@ the sinusoids with the original frequencies (dashed line). (d) Magnitudes
 of right generalized eigenvectors of the data matrix pencil with
 RANSAC ($\circ$) and without ($\square$). Both results show a clear distinction
 between the $t\le-0.3$ and $t\ge0$ regions in which the delayed
-observable exhibit different frequencies, while RANSAC also identifies
-this region as an outlier.
-\cwrremark{I think the idea in plot (d) is to notice where the values are zeros,
-  yes? And they are closer to zero when RANSAC is used.  Would be good to point
-  that out.}}
+observable exhibit different frequencies -- the magnitudes are closer to zero in the regions where the corresponding frequency is not present. RANSAC also identifies the data in the transition region as outliers and gives magnitudes closer to zero in the appropriate regions.
+}
 \label{fig:example1}
 \end{figure}
 
@@ -904,10 +845,10 @@ Image}
 
 For a more practical example, we consider a Transmission Electron Microscopy
 (TEM) image of a lattice of gold atoms from \cite{dahmen2009background}, shown
-in Figure~\ref{fig:lattice}(a). We consider the variation in brightness
+in figure~\ref{fig:lattice}(a). We consider the variation in brightness
 of the image as one transverses its pixels from left to right (x axis)
 or top to bottom (y axis). Figure~\ref{fig:lattice}(b) shows those
-variations over 51 pixes centered about a single pixel in a particular
+variations over 51 pixels centered about a single pixel in a particular
 region of the lattice. In that region, the hexagonal close-packed
 (HCP) lattice is oriented (almost) parallel to the x axis of the image.
 The brightness variation in the x direction has a period of about
@@ -932,15 +873,14 @@ the period is about 28 pixels and it spans two rows.}
 \end{figure}
 
 
-In various regions in Figure~\ref{fig:lattice}(a), the grain has
+In various regions in figure~\ref{fig:lattice}(a), the grain has
 different orientations and therefore different frequencies of variations
-in brightness in x and y directions. In this example will use clustering
-based on DMD features and constrained hierarchical clustering \cite{openshaw1977geographical}
-to split the pixels of the image based on local variations in brightness.
+in brightness in x and y directions. In this example will use DMD features and constrained hierarchical clustering \cite{openshaw1977geographical}
+to split the pixels of the image based on these variations.
 
-We construct the data matrices by combining the brightness variations
-(Figure~\ref{fig:lattice}(b)) for each pixel in each direction x
-and y ($n=2$).  Letting $P_{ij}$ denote the brighness of pixel $(i,j)$, we
+We construct the data matrices by combining the brightness data
+(figure~\ref{fig:lattice}(b)) for each pixel in each direction x
+and y ($n=2$).  Letting $P_{ij}$ denote the brightness of pixel $(i,j)$, we
 arrange the data as
 %
 \begin{equation}
@@ -969,8 +909,7 @@ arrange the data as
 The number of data series ($N$) is the number of pixels for which
 brightness variations over 51 pixels ($d=50$) were collected. The
 partitions in (\ref{eq:partitions}) therefore correspond to regions
-where grain orientation remains the same, regions where no lattice
-is present or borders between these two regions.
+where grain orientation remains the same or regions where no lattice is present.
 
 The generalized left eigenvectors of $\big(\hat{X},\hat{Y}\big)$
 in (\ref{eq:data_mult_trans}) have $2N$ elements (per \ref{sub:cluster_impl})
@@ -980,26 +919,25 @@ shows the element-wise absolute value of a generalized left eigenvector
 corresponding to the frequency closest to $2\omega_{y}\approx 1/14$.
 As discussed earlier, this frequency is present only in brightness
 variations in the y direction in the triangular shaped region where
-the lattice is parallel to the x axis (marked in Figure~\ref{fig:lattice}(a)).
-Indeed Figure~\ref{fig:lattice_mode}(a) shows the part of
+the lattice is parallel to the x axis (marked in figure~\ref{fig:lattice}(a)).
+Indeed figure~\ref{fig:lattice_mode}(a) shows the part of
 the eigenvector corresponding to the y direction, which exhibits large
 magnitudes in the triangular area where this frequency occurs. On
 the other hand, the elements corresponding to the $2\omega_{y}$ frequency
-but the x direction (Figure~\ref{fig:lattice_mode}(b)) are close
+but the x direction (figure~\ref{fig:lattice_mode}(b)) are close
 to zero in the same area as expected per Proposition 2 in
-\ref{sub:DMD_clustering}. \cwrremark{Remember to change this reference if we
-  remove Proposition~1.}
+\ref{sub:DMD_clustering}.
 
 \begin{figure}
 \includegraphics[scale=0.5]{TEM_modes}
 
 \caption{\label{fig:lattice_mode} The adjoint DMD mode (or generalized left
-eigenvector) based on data shown in Figure \ref{fig:lattice}(a) and
+eigenvector) based on data shown in figure \ref{fig:lattice}(a) and
 corresponding to the frequency $0.067\approx2\omega_{y}\approx\frac{1}{14}$.
 The mode was split into elements corresponding to the x (right) and
-y (left). The elements in the triangular shaped region in the middle
-have large magnitudes for scans in the y direction (left) and are
-close to zero for the x direction (right) as predicted by Figure \ref{fig:lattice}(b).}
+y (left) scanning directions. The elements in the triangular shaped region in the middle
+have large magnitudes for the y direction (left) and are
+close to zero for the x direction (right) as predicted by figure \ref{fig:lattice}(b).}
 \end{figure}
 
 
@@ -1017,22 +955,22 @@ each two newly merged clusters minimize the Ward criterion \cite{ward1963hierarc
 with respect to the DMD features. However, clusters can be merged only
 if they have adjacent pixels, i.e., if they satisfy the spatial connectivity
 constraints. This reduces computational time while ensuring that regions
-of the image corresponding to different dynamics remain connected.
+of the image corresponding to similar dynamics remain connected.
 An implementation of the Ward agglomerative clustering scheme is available
 with \emph{Scikit-learn}~\cite{pedregosa2011scikit}, a Python machine
 learning library.
 
-The results are shown on Figure~\ref{fig:clustering}, where the pixels
+The results are shown on figure~\ref{fig:clustering}, where the pixels
 are split into 6 regions based on their DMD features computed as specified
-in (\ref{sub:cluster_impl}). Since hierarchical clustering produces
+in section~\ref{sub:cluster_impl}. Since hierarchical clustering produces
 a dendogram which has separate pixels as leaves and a single cluster
 containing the whole image as a root, any number of clusters between
-those two extremes is apriori valid. However, once the dendogram is
-complete, it requires little additional computational effort to present
+those two extremes is a priori valid. However, once the dendogram is
+complete, it requires little additional computational effort to retrieve
 the partitions for any possible number of clusters. In the example
 presented here, we find that a choice of 6 partitions seem to capture
-the different regions in Figure \ref{fig:lattice} (a) correctly.
-Indeed in Figure~\ref{fig:clustering} we see four partitions where the
+the different regions in figure \ref{fig:lattice} (a) correctly.
+Indeed in figure~\ref{fig:clustering} we see four partitions where the
 lattice orientation causes different frequencies in variation in brightness
 in x and y direction. Two more partitions have no lattice present
 and form two spatially separated regions.
@@ -1041,7 +979,7 @@ and form two spatially separated regions.
 \includegraphics[scale=0.5]{TEM_clusters}
 
 \caption{\label{fig:clustering}Clustering of pixels based on DMD features
-computed from the brightness variation in x and y direction (see \ref{fig:lattice}).
+computed from the brightness variation in x and y direction (see figure \ref{fig:lattice}).
 A choice of 6 clusters gives the correct separation into regions with
 various lattice orientations and spatially separated regions with no lattice.}
 \end{figure}
@@ -1066,7 +1004,7 @@ for each series. It was shown that, when arranging all the data together,
 the generalized eigenvectors (adjoint DMD modes) of the corresponding
 Hankel matrices have an interesting property: their elements corresponding
 to certain series and frequencies tend to have magnitudes close to
-zero when those series do \cwrremark{not?} exhibit those particular frequencies.
+zero when those series do not exhibit those particular frequencies.
 We therefore conclude that projecting a sequence onto DMD modes computed
 from a larger set of given sequences, is a viable feature extraction
 method given a large amount of unlabeled series.
@@ -1085,7 +1023,7 @@ variance in brightness of spatially close pixels.
 
 \emph{Proof of Proposition 1}:
 
-Without loss of generality, we assume throught the proof that the
+Without loss of generality, we assume throughout the proof that the
 columns of $X$ and $Y$ defined in (\ref{eq:data_multiple}) are
 grouped together based on the partitions, i.e. the first $\left|I_{1}\right|$
 columns are data from systems in the first partition etc. This makes
@@ -1097,12 +1035,12 @@ and $\Xi_{j}=I_{l_{j}\times l_{j}}$ is the identity matrix. The data
 matrices take the following form:
 %
 \begin{equation}
-X^{\#}=\left[\begin{array}{ccccccc}
+X^{\#}=\begin{bmatrix}
 1 & 1 & \cdots & 1 & 1 & \cdots & 1\\
 \lambda_{11} & \lambda_{12} & \cdots & \lambda_{1l_{1}} & \lambda_{21} & \cdots & \lambda_{Pl_{P}}\\
 \vdots & \vdots &  & \vdots & \vdots &  & \vdots\\
 \lambda_{11}^{d} & \lambda_{12}^{d} & \cdots & \lambda_{1l_{1}}^{d} & \lambda_{21}^{d} & \cdots & \lambda_{Pl_{P}}^{d}
-\end{array}\right]\in\mathbb{C}^{d\times\sum l_{j}},
+\end{bmatrix}\in\mathbb{C}^{d\times\sum l_{j}},
 \end{equation}
 where the columns are increasing powers of all the complex frequencies
 of all systems arranged in order of their partitions.
@@ -1115,13 +1053,13 @@ corresponds to the column of $X^{\#}$ where the powers of $\lambda_{jk}$
 appear, and consider the matrix pencil
 %
 \begin{equation}
-\lambda X^{\#}-Y^{\#}=\left[\begin{array}{ccccc}
+\lambda X^{\#}-Y^{\#}=\begin{bmatrix}
 \lambda-\lambda_{11} & \cdots & \lambda-\lambda_{1l_{1}} & \lambda-\lambda_{21} & \cdots\\
 \vdots &  & \vdots & \vdots\\
 \lambda_{11}^{d}\left(\lambda-\lambda_{11}\right) & \cdots & \lambda_{1l_{1}}^{d}\left(\lambda-\lambda_{1l_{1}}\right) & \lambda_{21}^{d}\left(\lambda-\lambda_{21}\right) & \cdots
-\end{array}\right],
+\end{bmatrix},
 \end{equation}
-where $Y^{\#}$ is defined similarly to $X^{\#}$ with all power increased
+where $Y^{\#}$ is defined similarly to $X^{\#}$ with all powers increased
 by one.
 
 Clearly, if $\lambda$ is one of the exponents $\lambda_{jk}$, it
@@ -1144,7 +1082,7 @@ and $\Xi_{j}$ of any form as long as satisfies $\mathrm{rank}\left(\Xi_{j}\right
 The data matrices may now be expressed as
 %
 \begin{equation}
-X=\left[\begin{array}{ccc}
+X=\begin{bmatrix}
 \begin{array}{ccc}
 1 & \cdots & 1\\
 \vdots &  & \vdots\\
@@ -1153,20 +1091,20 @@ X=\left[\begin{array}{ccc}
 1 & \cdots & 1\\
 \vdots &  & \vdots\\
 \lambda_{P1}^{d} & \cdots & \lambda_{Pl_{P}}^{d}
-\end{array}\end{array}\right]\left[\begin{array}{ccc}
+\end{array}\end{bmatrix}\begin{bmatrix}
 \Xi_{1} &  & 0\\
  & \ddots\\
 0 &  & \Xi_{P}
-\end{array}\right],
+\end{bmatrix},
 \end{equation}
 and the matrix pencil as
 %
 \begin{equation}
-Y-\lambda X=\left(Y^{\#}-\lambda X^{\#}\right)\left[\begin{array}{ccc}
+Y-\lambda X=\left(Y^{\#}-\lambda X^{\#}\right)\begin{bmatrix}
 \Xi_{1} &  & 0\\
  & \ddots\\
 0 &  & \Xi_{P}
-\end{array}\right]
+\end{bmatrix}
 \end{equation}
 
 
@@ -1174,15 +1112,15 @@ Since $\Xi_{j}\in\mathbb{C}^{l_{j}\times\left|I_{j}\right|},\;\forall j$
 have full column rank,
 %
 \begin{equation}
-p_{\lambda}=\left[\begin{array}{ccc}
+p_{\lambda}=\begin{bmatrix}
 \Xi_{1} &  & 0\\
  & \ddots\\
 0 &  & \Xi_{P}
-\end{array}\right]^{+}p_{\lambda}^{\#}=\underset{\lambda_{jk}=\lambda}{\sum}\left[\begin{array}{ccc}
+\end{bmatrix}^{+}p_{\lambda}^{\#}=\underset{\lambda_{jk}=\lambda}{\sum}\begin{bmatrix}
 \Xi_{1}^{+} &  & 0\\
  & \ddots\\
 0 &  & \Xi_{P}^{+}
-\end{array}\right]e_{jk}\label{eq:eig_structure}
+\end{bmatrix}e_{jk}\label{eq:eig_structure}
 \end{equation}
 is clearly a generalized eigenvector of $\left(X,Y\right)$ when $\lambda$
 is one of the $l$ unique exponents. Since $X$ has rank $l$, we
@@ -1197,15 +1135,15 @@ has rank $nl_{j}$. In this case, the data matrices can be expressed
 as
 %
 \begin{equation}
-X=\left(X^{\#}\otimes I_{n\times n}\right)\left[\begin{array}{ccc}
+X=\left(X^{\#}\otimes I_{n\times n}\right)\begin{bmatrix}
 \Xi_{1} &  & 0\\
  & \ddots\\
 0 &  & \Xi_{P}
-\end{array}\right],\:Y=\left(Y^{\#}\otimes I_{n\times n}\right)\left[\begin{array}{ccc}
+\end{bmatrix},\:Y=\left(Y^{\#}\otimes I_{n\times n}\right)\begin{bmatrix}
 \Xi_{1} &  & 0\\
  & \ddots\\
 0 &  & \Xi_{P}
-\end{array}\right]
+\end{bmatrix}
 \end{equation}
 where $\otimes$ denotes the Kronecker product and $I_{n\times n}$
 and an $n$ by $n$ identity matrix.
@@ -1213,9 +1151,6 @@ and an $n$ by $n$ identity matrix.
 The argument in the proof of the $n=1$ case applies to each dimension
 separately, resulting in $n$ times as many generalized eigenvalues
 and eigenvectors, and the conclusion still holds.
-
-\cwrremark{Please check references for consistency: some problems in
-  capitalization (e.g., fourier instead of \{Fourier\}, journal titles, etc.}
 
  \bibliographystyle{abbrv}
 \bibliography{DMD_Clustering}

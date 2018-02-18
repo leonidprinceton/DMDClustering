@@ -6,3 +6,5 @@ pdflatex DMD_Clustering.tex
 bibtex DMD_Clustering.aux
 pdflatex DMD_Clustering.tex
 pdflatex DMD_Clustering.tex
+
+

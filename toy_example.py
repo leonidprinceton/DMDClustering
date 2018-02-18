@@ -14,6 +14,9 @@ d = 4
 t0 = -1
 t1 = 1
 
+pylab.rc("text", usetex=True)
+pylab.rc("font", family="serif")
+
 data_func = lambda t: numpy.cos(omega1*t)*(t<0) + 2*numpy.cos(omega2*t - numpy.pi/3)*(t>=0)
 t = numpy.arange(t0,t1+smaple_dt,smaple_dt)
 x = data_func(t)
@@ -26,7 +29,8 @@ x += numpy.random.normal(0,sigma,x.shape)
 pylab.figure(figsize=(6,5))
 pylab.subplot(221)
 pylab.title("(a)")
-pylab.xlabel("time")
+pylab.ylabel(r"$y(t)$")
+pylab.xlabel(r"$t$")
 pylab.scatter(t, x, color="black", marker="^", s=20)
 pylab.plot(t_plot, x_plot, linestyle="dashed", linewidth=1, color="black")
 
@@ -57,8 +61,9 @@ for use_ransac in range(2):
 	pylab.scatter(numpy.real(v), numpy.imag(v), color="black", marker="so"[use_ransac], facecolor="none", s=30)
 
 	pylab.subplot(224)
-	pylab.xlabel("time")
 	pylab.title("(d)")
+	pylab.ylabel(r"$\left| q(t)\right|$")
+	pylab.xlabel(r"$t$")
 
 	modes = numpy.abs(U.dot(wr))
 	pylab.scatter(t, modes[:,0], color="black", marker="so"[use_ransac], s=30)
@@ -66,7 +71,8 @@ for use_ransac in range(2):
 
 	pylab.subplot(223)
 	pylab.title("(c)")
-	pylab.xlabel("delays")
+	pylab.ylabel(r"$Re\left\{ p(d)\right\}$")
+	pylab.xlabel(r"$d$")
 
 	K = V.dot(Y.T).dot(U).dot(numpy.diag(1/s))
 	v,w = numpy.linalg.eig(K)
@@ -87,8 +93,8 @@ eigvals = numpy.exp([complex(0,omega1*smaple_dt), complex(0,omega2*smaple_dt)])
 eigvals = numpy.concatenate([eigvals,numpy.conj(eigvals)])
 pylab.scatter(numpy.real(eigvals), numpy.imag(eigvals), marker="x", s=100, color="black")
 pylab.title("(b)")
-pylab.xlabel("real part")
-pylab.ylabel("imaginary part")
+pylab.ylabel(r"$Im\left\{ \lambda\right\} $")
+pylab.xlabel(r"$Re\left\{ \lambda\right\} $")
 pylab.tight_layout()
 pylab.savefig("toy_example.pdf")
 	
